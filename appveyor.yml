@@ -39,4 +39,4 @@ on_success:
   - git remote set-url origin https://github.com/IQSS/dss-ec2gui.git
   - git add -A
   - git commit -a -m "Commit from AppVeyor"
-  - git push 
+  - git push --set-upstream origin gh-pages
