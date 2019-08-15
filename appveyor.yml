@@ -37,7 +37,7 @@ deploy_script:
 #  - git push origin head:master
   - git checkout -b gh-pages
 #  - git rm *.html -rf
-  - git rm *.json -rf
+#  - git rm *.json -rf
   - git rm template.gitignore
   - git rm .\images\* -rf 
   - git rm .\docs\* -rf
