@@ -31,7 +31,23 @@ deploy_script:
   - git config --global user.email "jinjie_liu@fas.harvard.edu" $env:op_build_user_email
   - git config --global user.name "liujinjie111" $env:op_build_user
   - ps: Add-Content "$env:USERPROFILE\.git-credentials" "https://$($env:access_token):x-oauth-basic@github.com`n"
-  - git subtree push --prefix docs origin gh-pages
+#  - git subtree push --prefix docs origin gh-pages
 #  - git add docs/*
 #  - git commit -m "publish new book"
 #  - git push origin head:master
+   - git checkout -b gh-pages
+   - git rm *.html -rf
+   - git rm *.json -rf
+   - git rm template.gitignore
+   - git rm .\images\* -rf 
+   - git rm .\docs\* -rf
+
+   - git checkout master .gitignore 
+   - git checkout master docs
+   - call xcopy .\docs .\ /E
+   - touch .nojekyll
+
+   - git add .
+   - git commit
+   - git push origin gh-pages
+   - git checkout master
