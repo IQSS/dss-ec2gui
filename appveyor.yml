@@ -35,7 +35,7 @@ deploy_script:
 #  - git add docs/*
 #  - git commit -m "publish new book"
 #  - git push origin head:master
-  - git checkout -b gh-pages
+  - git checkout --orphan gh-pages
   - git rm -rf .
   - xcopy .\docs . /E
   # EDIT your domain name or remove if not using a custom domain
@@ -43,4 +43,4 @@ deploy_script:
   - git remote set-url origin https://github.com/IQSS/dss-ec2gui.git
   - git add -A
   - git commit -a -m "Commit from AppVeyor"
-  - git push --set-upstream origin gh-pages
+  - git push 
