@@ -1,0 +1,31 @@
+install:
+  - ps: Write-Host "Install R..."
+  - choco install R
+  - ps: Write-Host "R is installed."
+  
+  - ps: Write-Host "Install pandoc..."
+  - choco install pandoc
+  - ps: Write-Host "pandoc is installed"
+  
+#  - ps: Write-Host "Install rmarkdown..."
+#  - ps: & "C:\Program Files\R\R-3.6.1\bin\rscript.exe" -e "install.packages('rmarkdown', repos='http://cran.case.edu/')"
+#  - ps: Write-Host "rmarkdown is installed"
+  
+#  - ps: Write-Host "Install bookdown..."
+#  - ps: & "C:\Program Files\R\R-3.6.1\bin\rscript.exe" -e "install.packages('bookdown', repos='http://cran.case.edu/')"
+#  - ps: Write-Host "bookdown is installed"
+ 
+#  - ps: Write-Host "Install reticulate..."
+#  - ps: & "C:\\Program Files\\R\\R-3.6.1\\bin\\rscript.exe" -e "install.packages('reticulate', repos='http://cran.case.edu/')"
+#  - ps: Write-Host "reticulate is installed"  
+ 
+build_script:
+  - ps: .\build.ps1
+ 
+after_build:
+  - git config --global credential.helper store
+  - git config --global user.email "flynnxu26@gmail.com"
+  - git config --global user.name "Flynn Xu"
+  - git add docs/*
+  - git commit -m "publish new book"
+  - git push origin head:master
