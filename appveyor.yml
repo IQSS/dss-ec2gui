@@ -35,19 +35,17 @@ deploy_script:
 #  - git add docs/*
 #  - git commit -m "publish new book"
 #  - git push origin head:master
-   - git checkout -b gh-pages
-   - git rm *.html -rf
-   - git rm *.json -rf
-   - git rm template.gitignore
-   - git rm .\images\* -rf 
-   - git rm .\docs\* -rf
-
-   - git checkout master .gitignore 
-   - git checkout master docs
-   - call xcopy .\docs .\ /E
-   - touch .nojekyll
-
-   - git add .
-   - git commit
-   - git push origin gh-pages
-   - git checkout master
+  - git checkout -b gh-pages
+  - git rm *.html -rf
+  - git rm *.json -rf
+  - git rm template.gitignore
+  - git rm .\images\* -rf 
+  - git rm .\docs\* -rf
+  - git checkout master .gitignore 
+  - git checkout master docs
+  - call xcopy .\docs .\ /E
+  - touch .nojekyll
+  - git add .
+  - git commit
+  - git push origin gh-pages
+  - git checkout master
