@@ -36,16 +36,11 @@ deploy_script:
 #  - git commit -m "publish new book"
 #  - git push origin head:master
   - git checkout -b gh-pages
-#  - git rm *.html -rf
-#  - git rm *.json -rf
-  - git rm template.gitignore
-  - git rm .\images\* -rf 
-  - git rm .\docs\* -rf
-  - git checkout master .gitignore 
-  - git checkout master docs
-  - call xcopy .\docs .\ /E
-  - touch .nojekyll
-  - git add .
-  - git commit
-  - git push origin gh-pages
-  - git checkout master
+  - git rm -rf .
+  - xcopy .\docs . /E
+  # EDIT your domain name or remove if not using a custom domain
+  # EDIT the origin of your repository - have to reset it here because AppVeyor pulls from SSH, but GitHub won't accept SSH pushes
+  - git remote set-url origin https://github.com/IQSS/dss-ec2gui.git
+  - git add -A
+  - git commit -a -m "Commit from AppVeyor"
+  - git push 
