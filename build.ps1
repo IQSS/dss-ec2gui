@@ -6,7 +6,7 @@ Write-Host "EBook creation starts"
  
 & "C:\Program Files\R\R-3.6.1\bin\rscript.exe" -e "bookdown::render_book('rmd_files', 'bookdown::gitbook')"
 #& "C:\Program Files\R\R-3.6.1\bin\rscript.exe" -e "bookdown::render_book('rmd_files', 'bookdown::pdf_book')"
-& "C:\Program Files\R\R-3.6.1\bin\rscript.exe" -e "bookdown::render_book('rmd_files', 'bookdown::epub_book')"
+#& "C:\Program Files\R\R-3.6.1\bin\rscript.exe" -e "bookdown::render_book('rmd_files', 'bookdown::epub_book')"
 
 & copy-item .nojekyll docs\ 
 & Get-ChildItem *.rds,*.log -recurse | Remove-Item
