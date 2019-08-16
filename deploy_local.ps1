@@ -6,7 +6,7 @@ Write-Host "Deploy GH Pages Starts"
 #& ps: Add-Content "$env:USERPROFILE\.git-credentials" "https://$($env:access_token):x-oauth-basic@github.com`n"
 & git checkout -b gh-pages
 & git rm -rf .
-& copy-item .\docs . -Recurse
+& move-item .\docs .
 & git push origin gh-pages
 & git checkout master
 & git push origin master
