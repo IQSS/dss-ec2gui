@@ -33,12 +33,12 @@ build_script:
   - ps: .\build.ps1
 #  - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
 
-on_success:
-  - git config --global credential.helper store
-  - ps: Add-Content "$HOME\.git-credentials" "https://$($env:access_token):x-oauth-basic@github.com`n"  
-  - git config --global user.email "jinjie_liu@fas.harvard.edu"
-  - git config --global user.name "liujinjie111"
-  - git add docs
-  - git commit -m "publish new book"
-  - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
-  - git push origin head:master
+#on_success:
+#  - git config --global credential.helper store
+#  - ps: Add-Content "$HOME\.git-credentials" "https://$($env:access_token):x-oauth-basic@github.com`n"  
+#  - git config --global user.email "jinjie_liu@fas.harvard.edu"
+#  - git config --global user.name "liujinjie111"
+#  - git add docs
+#  - git commit -m "publish new book"
+#  - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
+#  - git push origin head:master
