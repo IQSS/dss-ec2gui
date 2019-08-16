@@ -43,4 +43,4 @@ deploy_script:
   - git remote set-url origin https://github.com/IQSS/dss-ec2gui.git
   - git add -A
   - git commit -a -m "Commit from AppVeyor"
-  - git push --set-upstream origin gh-pages
+  - git push origin gh-pages
