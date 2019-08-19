@@ -6,7 +6,15 @@ repo: https://github.com/IQSS/dss-template
 
 rmd_files:
   - "index.Rmd"
-  - "01_chapter.Rmd"
+  - "part_1.Rmd"
+  - "part_2.Rmd"
+  - "part_3.Rmd"
+  - "part_4.Rmd"
+  - "part_5.Rmd"
+  - "part_6.Rmd"
+  - "part_7.Rmd"
+  - "part_8.Rmd"
+  - "part_9.Rmd"
 
 delete_merged_file: true
 
