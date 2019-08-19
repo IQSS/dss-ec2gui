@@ -1,0 +1,338 @@
+# Create and Run a Multi-Layer Perceptron Model Using Neural Networks
+
+The example below uses some basic functions from TensorFlow to create neural networks over the customized data sets stored in S3 and write the result plots to S3. The example uses AWID wireless network intrusion detection dataset with 154 features and a class label having 4 network activity type categories. The data set has been pre-processed with data transformation, normalization, and under-sampling. 
+
+## Install and Import Dependencies
+
+88.	Paste the following code into the **In** cell in the jupyter notebook to **import dependencies** into the notebook cell:
+
+```python
+import pandas as pd
+import numpy as np
+import tensorflow as tf
+import datetime
+import matplotlib.pyplot as plt
+from sklearn.utils import shuffle
+from smart_open import open
+```
+89.	**smart_open** is a Python 2 & Python 3 library for efficient streaming of very large files from/to storages such as S3, HDFS, WebHDFS, HTTP, HTTPS, SFTP, or local filesystem. It builds on boto3 and other remote storage libraries but offers a clean unified Pythonic API. Unlike the other packages in the example, you need to **install this package** to the “tensorflow_p36” environment before you can import it in the code. To do that, go to jupyter **Home** tab, click **Conda**. Remember we have activated the “tensorflow_p36” environment.
+90.	Select the “**smart_open**” package in the left bottom plane and move it to the right bottom plane by clicking the **arrow** button.
+91.	You should see the “smart_open” package show up in the right bottom plane. Click **Refresh package list**.
+92.	**Repeat** the steps 80-87 to make sure that the installed packages in the “tensorflow_p36” environment are fully updated. 
+93.	Run the cell by pressing **Shift+Enter** or click on **Run**. When the cell finishes running, the number on the left of the cell will change from **In[*]:** to **In[1]**.
+
+## Provide Utilities-Related Functions
+
+94.	Provide the **utilities functions** for reading files, checking column names, checking missing values, and transforming the class labels from a categorical variable to 4 dummy variables.
+
+```python
+# Utilities-related functions
+def now():
+    tmp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    return tmp
+
+def read_file(file):
+    try:
+        df = pd.read_csv(file, index_col = 0)
+        print("{}: {} has {} observations and {} columns".format(now(), file, df.shape[0], df.shape[1]))
+        print("{}: Column name checking::: {}".format(now(), df.columns.tolist()))
+    except MemoryError as e:
+        print(e.message)
+    return df
+
+# Read data frame, check missing data, find number of missing
+def check_missing(df):
+    try:
+        if(isinstance(df, pd.DataFrame)):
+            na_pool = pd.concat([df.isnull().any(), df.isnull().sum(), df.isnull().sum() / df.shape[0]], axis = 1, keys = ["na_bool", "na_sum", "na_percent"])
+            na_pool = na_pool.loc[na_pool["na_bool"] ==  True]
+            return na_pool
+        else:
+            print("{}: The input is not panda DataFrame".format(now()))
+    except (UnboundLocalError, RuntimeError):
+        print("{}: The input has something wrong".format(now()))
+
+def transform(df):
+    df.loc[df.type == 1, 'isNormal'] = 1
+    df.loc[df.type != 1, 'isNormal'] = 0
+
+    df.loc[df.type == 2, 'isImpersonation'] = 1
+    df.loc[df.type != 2, 'isImpersonation'] = 0
+
+    df.loc[df.type == 3, 'isFlooding'] = 1
+    df.loc[df.type != 3, 'isFlooding'] = 0
+
+    df.loc[df.type == 4, 'isInjection'] = 1
+    df.loc[df.type != 4, 'isInjection'] = 0
+
+    print(df.isNormal.value_counts())
+    print(df.isImpersonation.value_counts())
+    print(df.isFlooding.value_counts())
+    print(df.isInjection.value_counts())
+
+    df2 = pd.concat([df.isNormal, df.isImpersonation, df.isFlooding, df.isInjection], axis = 1)
+    df1 = df.drop(['type', 'isNormal', 'isImpersonation', 'isFlooding', 'isInjection'], axis = 1)   
+
+    return df1, df2
+```
+  
+## Read Data from S3 and Inspect the Data
+
+95.	You need to find the **Access Key** and the **Secret Access Key**. Click on your **username** at the top right of the AWS Management Console page.
+96.	Click on the **My Security Credentials** link from the drop-down menu.
+97.	Find the **Access keys (access key ID and secret access key)** section and click on **Create New Access Key**.
+98.	Download the **Access Key file (in .csv format)** to a safe local folder for later use.
+99.	Paste the following code into the **In** cell in the jupyter notebook to read data (both training set and testing set) from S3 and then inspect the data:
+
+```python
+# Read in datafile
+aws_key = 'YOUR_AWS_ACCESS_KEY'
+aws_secret = 'YOUR_AWS_SECRET_ACCESS_KEY'
+
+bucket_name = 'YOUR_S3_BUCKET_NAME'
+object_train_key = 'train.csv'
+object_test_key = 'test.csv'
+
+path_train = 's3://{}:{}@{}/{}'.format(aws_key, aws_secret, bucket_name, object_train_key)
+path_test = 's3://{}:{}@{}/{}'.format(aws_key, aws_secret, bucket_name, object_test_key)
+
+data_trn = read_file(smart_open(path_train))
+print(check_missing(data_trn))
+data_trn.rename(columns={'154':'type'}, inplace=True)
+print(data_trn.head(5))
+print(data_trn.type.value_counts())
+
+data_tst = read_file(smart_open(path_test))
+print(check_missing(data_tst))
+data_tst.rename(columns={'154':'type'}, inplace=True)
+print(data_tst.head(5))
+print(data_tst.type.value_counts())
+```
+
+## Perform the Data Processing Specific to Neural Networks
+
+100.	Split the **training set** into a **training part** and a **validation part**:
+
+```python
+normal = data_trn[data_trn.type == 1]
+impersonation = data_trn[data_trn.type == 2]
+flooding = data_trn[data_trn.type == 3]
+injection = data_trn[data_trn.type == 4]
+
+normal_trn = normal.sample(frac = 0.7)
+impersonation_trn = impersonation.sample(frac = 0.7)
+flooding_trn = flooding.sample(frac = 0.7)
+injection_trn = injection.sample(frac = 0.7)
+train = pd.concat([normal_trn, impersonation_trn, flooding_trn, injection_trn], axis = 0)
+validation = data_trn.loc[~data_trn.index.isin(train.index)]
+
+#shuffle the dataframes so that rows are in random order
+train = shuffle(train)
+validation = shuffle(validation)
+```
+101.	**Transform the class labels** from a categorical variable to 4 dummy variables and **check** the correctness:
+
+```python
+x_train, y_train = transform(train)
+x_validation, y_validation = transform(validation)
+x_test, y_test = transform(data_tst)
+
+ # check to ensure that all of training and testing sets have correct shape
+print(x_train.shape)
+print(y_train.shape)
+print(x_validation.shape)
+print(y_validation.shape)  
+print(x_test.shape)
+print(y_test.shape)  
+```
+
+## Create a Multi-Layer Perceptron Model Using Neural Networks
+
+102.	Define **parameters** for your neural network:
+
+```python
+# parameters
+learning_rate = 0.005
+data_size = x_train.shape[0]
+batch_size = 1150
+training_epochs = 2000
+training_dropout = 0.9
+```
+103.	Define the **neural network configuration**:
+
+```python
+# input place holders
+x = tf.compat.v1.placeholder(tf.float32, [None, x_train.shape[1]])
+y = tf.compat.v1.placeholder(tf.float32, [None, y_train.shape[1]])
+rate = tf.compat.v1.placeholder(tf.float32)
+
+#weights, bias, and activation function for n layers
+num_nodes = int(x_train.shape[1] * (2 / 3))
+w1 = tf.Variable(tf.random.normal([x_train.shape[1], num_nodes], stddev = 0.15))
+b1 = tf.Variable(tf.random.normal([num_nodes]))
+a1 = tf.nn.relu(tf.matmul(x, w1) + b1)
+a1_out = tf.nn.dropout(a1, rate = rate)
+
+w2 = tf.Variable(tf.random.normal([num_nodes, y_train.shape[1]], stddev = 0.15))
+b2 = tf.Variable(tf.random.normal([y_train.shape[1]]))
+z2 = tf.matmul(a1_out, w2) + b2
+a2 = tf.nn.softmax(z2)
+```
+If you define a multi-layer network with linear neurons, then the network will only be a linear function. To allow the network to capture non-linear properties, you can add an activation function at each layer. The activation functions could be ReLU, sigmoid, or tanh.   
+104.	Define a **cost function** and an **optimizer** to learn the **weights** and **biases**:
+
+```python
+cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits_v2(logits = z2, labels = y))
+optimizer = tf.compat.v1.train.AdamOptimizer(learning_rate = learning_rate).minimize(cost)
+```
+105.	Define the **evaluation metric**:
+
+```python
+pred = tf.argmax(a2, 1)
+correct = tf.equal(tf.argmax(a2, 1), tf.argmax(y, 1))
+accuracy = tf.reduce_mean(tf.cast(correct, tf.float32))
+```
+
+## Train the Multi-Layer Perceptron Model
+
+106.	Set up the **data structures** and **file paths** to **save the intermediate training results**:
+
+```python
+# train model
+train_accuracy_summary = []
+train_cost_summary = []
+valid_accuracy_summary = []
+valid_cost_summary = []
+stop_early = 0
+
+checkpoint1 = './best_model_pca.ckpt'
+checkpoint2 = './weights_pca.ckpt'
+saver = tf.compat.v1.train.Saver(max_to_keep = 1)
+weights_saver = tf.compat.v1.train.Saver(var_list = [w1])
+```
+We use the **temporary storage** associated with this EC2 Deep Learning instance to save the intermediate training results. Those results will be gone when the instance is terminated. It is not efficient to save those intermediate results to S3. Since the instance is run on Amazon Linux system (instead of Windows), please make sure to write down the correct file paths.  
+107.	Run the **training loop** with the defined parameters in step 102. We save the model and its associated weights only for the model with the highest validation accuracy. We also use an early stop criterion to stop the training loop early if the model has been trained long enough and the validation accuracy cannot be improved further in the next 20 loops.
+
+```python
+with tf.compat.v1.Session() as sess:
+    sess.run(tf.compat.v1.global_variables_initializer())
+
+    for epoch in range(training_epochs):
+        for batch in range(int(data_size/batch_size)):
+            batch_x = x_train[batch*batch_size: (1+batch)*batch_size]
+            batch_y = y_train[batch*batch_size: (1+batch)*batch_size]
+
+            sess.run([optimizer], feed_dict = {x: batch_x, y: batch_y, rate: 1 - training_dropout})
+
+        train_accuracy, train_cost = sess.run([accuracy, cost], feed_dict = {x: x_train, y: y_train, rate: 1 - training_dropout})
+        valid_accuracy, valid_cost = sess.run([accuracy, cost], feed_dict = {x: x_validation, y: y_validation, rate: 1 - training_dropout})
+
+        print("Epoch:", epoch,
+              "Train_Accuracy =", "{:.5f}".format(train_accuracy),
+              "Train_Cost =", "{:.5f}".format(train_cost), 
+              "Valid_Accuracy =", "{:.5f}".format(valid_accuracy),
+              "Valid_Cost =", "{:.5f}".format(valid_cost))
+
+        if epoch > 0 and valid_accuracy > max(valid_accuracy_summary):
+            saver.save(sess, checkpoint1)
+            weights_saver.save(sess, checkpoint2)
+
+        train_accuracy_summary.append(train_accuracy)
+        train_cost_summary.append(train_cost)
+        valid_accuracy_summary.append(valid_accuracy)
+        valid_cost_summary.append(valid_cost)
+       
+        if valid_accuracy < max(valid_accuracy_summary) and epoch > 1000:
+            stop_early += 1
+            if stop_early == 20:
+                break
+        else:
+            stop_early = 0
+
+    print()
+    print("Optimization Finished!")
+```
+
+## Evaluate the Multi-Layer Perceptron Model
+
+108.	We restore the **best model** saved from the training phase and run this model on the **test set** to get the testing accuracy.
+109.	We also restore the **weights** associated with the best model and then use them to calculate the **importance score for each feature** and print the scores out in the descending order.
+110.	We plot the feature importance and **save the plot permanently to S3** using the “**smart_open**” Python library. The following code covers the steps 108-110.
+
+```python
+with tf.compat.v1.Session() as sess:
+    saver.restore(sess, checkpoint1)
+    weights_saver.restore(sess, checkpoint2)
+    graph = tf.compat.v1.get_default_graph()
+    
+    training_accuracy = sess.run(accuracy, feed_dict = {x: x_train, y: y_train, rate: 1 - training_dropout})
+    validation_accuracy = sess.run(accuracy, feed_dict = {x: x_validation, y: y_validation, rate: 0})
+    
+    print("Results using the best Validation_Accuracy:")
+    print("Training Accuracy =", training_accuracy)
+    print("Validation Accuracy =", validation_accuracy)
+
+    testing_prediction, testing_accuracy = sess.run([pred, accuracy], feed_dict = {x: x_test, y: y_test, rate: 0})
+    
+    print()
+    print("Results using the best Validation_Accuracy:")
+    print("Testing Accuracy =", testing_accuracy)
+
+    w1 = w1.eval(session=sess)
+ 
+    df = pd.DataFrame(w1)
+    print(df.shape)
+    print(df.head(5))
+
+    df.loc[:, "sum"] = df.sum(axis = 1)
+    print(df.head(5))
+    
+
+    dt_importances = abs(df.loc[:, "sum"].values)
+    dt_indices = np.argsort(dt_importances)[:: -1]
+    print("Feature ranking:: ANN:")
+
+    for f in range(x_train.shape[1]):
+        print("%d. feature %d importance (%f)" % (f + 1, dt_indices[f], dt_importances[dt_indices[f]]))
+
+    plt.figure()
+    plt.title("Feature importances:: ANN" )
+    plt.bar(range(x_train.shape[1]), dt_importances[dt_indices], color = "r", align = "center")
+    plt.xticks(range(x_train.shape[1]), dt_indices)
+    plt.xlim([-1, x_train.shape[1]])
+    plt.savefig('./importance.png')
+
+    importance_key = 'feature_importance.png'
+    imp_graph_path = 's3://{}:{}@{}/{}'.format(aws_key, aws_secret, bucket_name, importance_key)
+    with open('./importance.png', 'rb') as f:
+        content = f.read()
+    with open(imp_graph_path, 'wb') as fout:
+        fout.write(content)
+```
+111.	Finally, we also plot the training vs. validation accuracy and the training vs. validation cost over the entire training epochs and **save the plot permanently to S3** using the “**smart_open**” Python library.
+
+```python
+# Plot accuracy and cost summaries
+f, (ax1, ax2) = plt.subplots(2, 1, sharex = True, figsize = (10,4))
+
+ax1.plot(train_accuracy_summary) # blue
+ax1.plot(valid_accuracy_summary) # green
+ax1.set_title('Accuracy')
+
+ax2.plot(train_cost_summary) # blue
+ax2.plot(valid_cost_summary) # green
+ax2.set_title('Cost')
+
+plt.xlabel('Epochs')
+plt.savefig('./epochs.png')
+
+epoch_key = 'training_epoch.png'
+epoch_graph_path = 's3://{}:{}@{}/{}'.format(aws_key, aws_secret, bucket_name, epoch_key)
+with open('./epochs.png', 'rb') as f:
+    content = f.read()
+with smart_open(epoch_graph_path, 'wb') as fout:
+    fout.write(content)
+```
+ 
+
+ 

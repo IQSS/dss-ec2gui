@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>3 Launch an Amazon Deep Learning Amazon Machine Images (AMI) instance | Using AWS EC2 Compute and S3 Storage for Model Fitting</title>
+  <meta name="description" content="This is a tutorial for using AWS EC2 cmpute and S3 storage for model fitting via AWWS Management Console." />
+  <meta name="generator" content="bookdown 0.12 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="3 Launch an Amazon Deep Learning Amazon Machine Images (AMI) instance | Using AWS EC2 Compute and S3 Storage for Model Fitting" />
+  <meta property="og:type" content="book" />
+  
+  
+  <meta property="og:description" content="This is a tutorial for using AWS EC2 cmpute and S3 storage for model fitting via AWWS Management Console." />
+  <meta name="github-repo" content="IQSS/dss-ec2gui" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="3 Launch an Amazon Deep Learning Amazon Machine Images (AMI) instance | Using AWS EC2 Compute and S3 Storage for Model Fitting" />
+  
+  <meta name="twitter:description" content="This is a tutorial for using AWS EC2 cmpute and S3 storage for model fitting via AWWS Management Console." />
+  
+
+<meta name="author" content="" />
+
+
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+<link rel="prev" href="set-up-an-aws-account.html">
+<link rel="next" href="grant-an-ec2-instance-access-to-s3-bucket.html">
+<script src="libs/jquery-2.2.3/jquery.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+
+<style type="text/css">
+a.sourceLine { display: inline-block; min-height: 1.25em; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; }
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; }
+pre.numberSource a.sourceLine::before
+  { content: attr(data-line-number);
+    position: absolute; left: -5em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+@media screen {
+a.sourceLine::before { text-decoration: underline; color: initial; }
+}
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.bn { color: #40a070; } /* BaseN */
+code span.fl { color: #40a070; } /* Float */
+code span.ch { color: #4070a0; } /* Char */
+code span.st { color: #4070a0; } /* String */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.ot { color: #007020; } /* Other */
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.fu { color: #06287e; } /* Function */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code span.cn { color: #880000; } /* Constant */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.im { } /* Import */
+code span.va { color: #19177c; } /* Variable */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.op { color: #666666; } /* Operator */
+code span.bu { } /* BuiltIn */
+code span.ex { } /* Extension */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.at { color: #7d9029; } /* Attribute */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+</style>
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="./">A template for a bookdown website</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Introduction</a><ul>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#table-of-contents"><i class="fa fa-check"></i>Table of Contents</a></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#authors-and-sources"><i class="fa fa-check"></i>Authors and Sources</a></li>
+</ul></li>
+<li class="chapter" data-level="1" data-path="aws-ec2-and-s3-services.html"><a href="aws-ec2-and-s3-services.html"><i class="fa fa-check"></i><b>1</b> AWS EC2 and S3 Services</a><ul>
+<li class="chapter" data-level="1.1" data-path="aws-ec2-and-s3-services.html"><a href="aws-ec2-and-s3-services.html#ec2-services"><i class="fa fa-check"></i><b>1.1</b> EC2 Services</a></li>
+<li class="chapter" data-level="1.2" data-path="aws-ec2-and-s3-services.html"><a href="aws-ec2-and-s3-services.html#s3-services"><i class="fa fa-check"></i><b>1.2</b> S3 Services</a></li>
+</ul></li>
+<li class="chapter" data-level="2" data-path="set-up-an-aws-account.html"><a href="set-up-an-aws-account.html"><i class="fa fa-check"></i><b>2</b> Set Up an AWS Account</a></li>
+<li class="chapter" data-level="3" data-path="launch-an-amazon-deep-learning-amazon-machine-images-ami-instance.html"><a href="launch-an-amazon-deep-learning-amazon-machine-images-ami-instance.html"><i class="fa fa-check"></i><b>3</b> Launch an Amazon Deep Learning Amazon Machine Images (AMI) instance</a></li>
+<li class="chapter" data-level="4" data-path="grant-an-ec2-instance-access-to-s3-bucket.html"><a href="grant-an-ec2-instance-access-to-s3-bucket.html"><i class="fa fa-check"></i><b>4</b> Grant an EC2 Instance Access to S3 Bucket</a><ul>
+<li class="chapter" data-level="4.1" data-path="grant-an-ec2-instance-access-to-s3-bucket.html"><a href="grant-an-ec2-instance-access-to-s3-bucket.html#create-an-identity-and-access-management-iam-role"><i class="fa fa-check"></i><b>4.1</b> Create an Identity and Access Management (IAM) Role</a></li>
+<li class="chapter" data-level="4.2" data-path="grant-an-ec2-instance-access-to-s3-bucket.html"><a href="grant-an-ec2-instance-access-to-s3-bucket.html#attach-an-iam-role-to-an-instance"><i class="fa fa-check"></i><b>4.2</b> Attach an IAM Role to an Instance</a></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="use-the-amazon-simple-storage-service-s3-console-to-store-and-transfer-your-data.html"><a href="use-the-amazon-simple-storage-service-s3-console-to-store-and-transfer-your-data.html"><i class="fa fa-check"></i><b>5</b> Use the Amazon Simple Storage Service (S3) Console to Store and Transfer Your Data</a><ul>
+<li class="chapter" data-level="5.1" data-path="use-the-amazon-simple-storage-service-s3-console-to-store-and-transfer-your-data.html"><a href="use-the-amazon-simple-storage-service-s3-console-to-store-and-transfer-your-data.html#create-a-bucket"><i class="fa fa-check"></i><b>5.1</b> Create a Bucket</a></li>
+<li class="chapter" data-level="5.2" data-path="use-the-amazon-simple-storage-service-s3-console-to-store-and-transfer-your-data.html"><a href="use-the-amazon-simple-storage-service-s3-console-to-store-and-transfer-your-data.html#upload-your-dataset"><i class="fa fa-check"></i><b>5.2</b> Upload Your Dataset</a></li>
+</ul></li>
+<li class="chapter" data-level="6" data-path="retrieve-the-ip-address-of-your-deep-learning-ami-instance-and-connect-to-your-deep-learning-ami-instance.html"><a href="retrieve-the-ip-address-of-your-deep-learning-ami-instance-and-connect-to-your-deep-learning-ami-instance.html"><i class="fa fa-check"></i><b>6</b> Retrieve the IP Address of Your Deep Learning AMI Instance and Connect to Your Deep Learning AMI Instance</a><ul>
+<li class="chapter" data-level="6.1" data-path="retrieve-the-ip-address-of-your-deep-learning-ami-instance-and-connect-to-your-deep-learning-ami-instance.html"><a href="retrieve-the-ip-address-of-your-deep-learning-ami-instance-and-connect-to-your-deep-learning-ami-instance.html#connect-to-your-deep-learning-ami-instance-from-a-windows-machine"><i class="fa fa-check"></i><b>6.1</b> Connect to Your Deep Learning AMI Instance from a Windows Machine</a></li>
+<li class="chapter" data-level="6.2" data-path="retrieve-the-ip-address-of-your-deep-learning-ami-instance-and-connect-to-your-deep-learning-ami-instance.html"><a href="retrieve-the-ip-address-of-your-deep-learning-ami-instance-and-connect-to-your-deep-learning-ami-instance.html#connect-to-your-deep-learning-ami-instance-from-a-mac-or-linux-machine"><i class="fa fa-check"></i><b>6.2</b> Connect to Your Deep Learning AMI Instance from a Mac or Linux Machine</a></li>
+</ul></li>
+<li class="chapter" data-level="7" data-path="explore-amazon-deep-learning-ami-and-connect-to-a-jupyter-notebook.html"><a href="explore-amazon-deep-learning-ami-and-connect-to-a-jupyter-notebook.html"><i class="fa fa-check"></i><b>7</b> Explore Amazon Deep Learning AMI and Connect to a Jupyter Notebook</a></li>
+<li class="chapter" data-level="8" data-path="create-and-run-a-multi-layer-perceptron-model-using-neural-networks.html"><a href="create-and-run-a-multi-layer-perceptron-model-using-neural-networks.html"><i class="fa fa-check"></i><b>8</b> Create and Run a Multi-Layer Perceptron Model Using Neural Networks</a><ul>
+<li class="chapter" data-level="8.1" data-path="create-and-run-a-multi-layer-perceptron-model-using-neural-networks.html"><a href="create-and-run-a-multi-layer-perceptron-model-using-neural-networks.html#install-and-import-dependencies"><i class="fa fa-check"></i><b>8.1</b> Install and Import Dependencies</a></li>
+<li class="chapter" data-level="8.2" data-path="create-and-run-a-multi-layer-perceptron-model-using-neural-networks.html"><a href="create-and-run-a-multi-layer-perceptron-model-using-neural-networks.html#provide-utilities-related-functions"><i class="fa fa-check"></i><b>8.2</b> Provide Utilities-Related Functions</a></li>
+<li class="chapter" data-level="8.3" data-path="create-and-run-a-multi-layer-perceptron-model-using-neural-networks.html"><a href="create-and-run-a-multi-layer-perceptron-model-using-neural-networks.html#read-data-from-s3-and-inspect-the-data"><i class="fa fa-check"></i><b>8.3</b> Read Data from S3 and Inspect the Data</a></li>
+<li class="chapter" data-level="8.4" data-path="create-and-run-a-multi-layer-perceptron-model-using-neural-networks.html"><a href="create-and-run-a-multi-layer-perceptron-model-using-neural-networks.html#perform-the-data-processing-specific-to-neural-networks"><i class="fa fa-check"></i><b>8.4</b> Perform the Data Processing Specific to Neural Networks</a></li>
+<li class="chapter" data-level="8.5" data-path="create-and-run-a-multi-layer-perceptron-model-using-neural-networks.html"><a href="create-and-run-a-multi-layer-perceptron-model-using-neural-networks.html#create-a-multi-layer-perceptron-model-using-neural-networks"><i class="fa fa-check"></i><b>8.5</b> Create a Multi-Layer Perceptron Model Using Neural Networks</a></li>
+<li class="chapter" data-level="8.6" data-path="create-and-run-a-multi-layer-perceptron-model-using-neural-networks.html"><a href="create-and-run-a-multi-layer-perceptron-model-using-neural-networks.html#train-the-multi-layer-perceptron-model"><i class="fa fa-check"></i><b>8.6</b> Train the Multi-Layer Perceptron Model</a></li>
+<li class="chapter" data-level="8.7" data-path="create-and-run-a-multi-layer-perceptron-model-using-neural-networks.html"><a href="create-and-run-a-multi-layer-perceptron-model-using-neural-networks.html#evaluate-the-multi-layer-perceptron-model"><i class="fa fa-check"></i><b>8.7</b> Evaluate the Multi-Layer Perceptron Model</a></li>
+</ul></li>
+<li class="chapter" data-level="9" data-path="get-the-results-locally.html"><a href="get-the-results-locally.html"><i class="fa fa-check"></i><b>9</b> Get the Results Locally</a></li>
+<li class="divider"></li>
+<li><a href="https://github.com/rstudio/bookdown" target="blank">Published with bookdown</a></li>
+
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Using AWS EC2 Compute and S3 Storage for Model Fitting</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="launch-an-amazon-deep-learning-amazon-machine-images-ami-instance" class="section level1">
+<h1><span class="header-section-number">3</span> Launch an Amazon Deep Learning Amazon Machine Images (AMI) instance</h1>
+<ol start="12" style="list-style-type: decimal">
+<li>Log in your <strong>AWS account</strong>. This will go to the AWS Management Console.</li>
+<li>In the <strong>AWS Management Console</strong>, click on the <strong>Services</strong> menu, then click <strong>EC2</strong>.</li>
+<li>On the upper right corner, click the <strong>region</strong> button, select <strong>US East (N. Virginia)</strong>.</li>
+<li>Click <strong>Launch Instance</strong>.</li>
+<li>On the <strong>Step 1: Choose an Amazon Machine Image (AMI) page</strong>, scroll down to <strong>Deep Learning AMI (Amazon Linux)</strong>.<br />
+Confirm that it is the <strong>Amazon Linux</strong> version, <strong>not</strong> the Ubuntu or Windows version. There are multiple versions, so select the highest version.</li>
+<li>For <strong>Deep Learning AMI (Amazon Linux)</strong>, click <strong>Select</strong>.<br />
+The Deep Learning AMI is designed to provide a stable, secure, and high-performance execution environment for deep learning applications running on Amazon EC2. It includes popular deep learning frameworks, including MXNet, TensorFlow, PyTorch, Keras, Chainer, Caffe, Theano, and CNTK.</li>
+<li>On <strong>Step 2: Choose an Instance type page</strong>, for <strong>Filter by</strong>, select <strong>GPU instances</strong>.</li>
+<li>Select <strong>p2.xlarge</strong>.</li>
+<li>Click <strong>Next: Configure Instance Details</strong>.</li>
+<li>On the <strong>Step 3: Configure Instance Details page</strong>, keep the default settings.</li>
+<li>Click <strong>Next: Add Storage</strong>.</li>
+<li>On the <strong>Step 4: Add Storage</strong>, keep the default storage settings.</li>
+<li>Click <strong>Next: Add Tags</strong>.</li>
+<li>On the <strong>Step 5: Add Tags page</strong>, click <strong>Add Tag</strong>, then:
+<ul>
+<li>For <strong>Key</strong>, type: Name</li>
+<li>For <strong>Value</strong>, type: Deep Learning Development</li>
+</ul></li>
+<li>Click <strong>Review and Launch</strong>.</li>
+<li>On the <strong>Step 7: Review Instance Launch page</strong>, review your instance settings and click <strong>Launch</strong>.</li>
+<li>On <strong>Select an existing key pair or create a new key pair</strong> window, if applicable, select <strong>Create a new key pair</strong> from the dropdown menu. Assign a <strong>key pair name</strong> (for example, DeepL) and <strong>download</strong> the private key file in a secure and accessible location. Amazon EC2 gives you a PEM file. So, you would need to convert it to PPK files later for Windows SSH connectivity to the instance.<br />
+</li>
+<li>Click <strong>Launch Instances</strong>.</li>
+<li>The launch could fail if you choose regions other than US East (N. Virginia) at the first beginning. You could either change the region to US East (N. Virginia) and retry or launch it after you get an email saying that your account is now fully verified in that region. This verification will take several minutes.</li>
+</ol>
+
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="set-up-an-aws-account.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="grant-an-ec2-instance-access-to-s3-bucket.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/lunr.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": true,
+"twitter": true,
+"google": false,
+"linkedin": false,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"all": ["facebook", "google", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": "https://github.com/IQSS/dss-template/edit/master/part_3.Rmd",
+"text": "Edit"
+},
+"history": {
+"link": null,
+"text": null
+},
+"download": ["template.pdf", "template.epub"],
+"toc": {
+"collapse": "section",
+"scroll_highlight": true
+}
+});
+});
+</script>
+
+</body>
+
+</html>
